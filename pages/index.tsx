@@ -1,0 +1,169 @@
+import React, { useMemo, useState } from "react";
+
+// ---- UI Primitives ----
+type NavLinkProps = { href: string; children: React.ReactNode };
+const NavLink: React.FC<NavLinkProps> = ({ href, children }) => (
+  <a href={href} className="px-3 py-2 text-sm md:text-base text-gray-700 hover:text-indigo-500 transition">
+    {children}
+  </a>
+);
+
+type SectionTitleProps = { en: string; ja: string };
+const SectionTitle: React.FC<SectionTitleProps> = ({ en, ja }) => (
+  <div className="mb-4">
+    <p className="uppercase tracking-[0.4em] text-xs text-indigo-500">{en}</p>
+    <h2 className="text-lg md:text-xl font-semibold mt-1 text-gray-900">{ja}</h2>
+  </div>
+);
+
+type CardProps = { title: string; desc: string; icon: string; accent: string };
+const Card: React.FC<CardProps> = ({ title, desc, icon, accent }) => (
+  <div className={`rounded-lg border p-3 transition bg-white ${accent}`}>
+    <div className="text-xl mb-1" aria-hidden>{icon}</div>
+    <h3 className="font-semibold mb-1 text-sm md:text-base text-gray-900">{title}</h3>
+    <p className="text-gray-600 text-xs md:text-sm leading-relaxed">{desc}</p>
+  </div>
+);
+
+// ---- Contact (Formspree) ----
+const FORMSPREE_ENDPOINT = "https://formspree.io/f/xnjbbbaa";
+type FormStatus = "idle" | "sending" | "sent" | "error";
+
+const ContactForm: React.FC = () => {
+  const [status, setStatus] = useState<FormStatus>("idle");
+
+  return (
+    <form
+      className="space-y-2"
+      onSubmit={async (e) => {
+        e.preventDefault();
+        if (status === "sending") return;
+        setStatus("sending");
+        try {
+          const form = e.currentTarget as HTMLFormElement;
+          const data = new FormData(form);
+          const res = await fetch(FORMSPREE_ENDPOINT, { method: "POST", body: data, headers: { Accept: "application/json" } });
+          if (!res.ok) throw new Error();
+          form.reset();
+          setStatus("sent");
+        } catch {
+          setStatus("error");
+        }
+      }}
+    >
+      <input type="text" name="_gotcha" tabIndex={-1} autoComplete="off" className="hidden" />
+
+      <input required name="name" placeholder="お名前" className="border border-gray-300 bg-white text-gray-900 rounded px-2 py-2 w-full text-sm" />
+      <input required name="email" type="email" placeholder="メールアドレス" className="border border-gray-300 bg-white text-gray-900 rounded px-2 py-2 w-full text-sm" />
+      <textarea
+        required
+        name="message"
+        rows={5}
+        placeholder={"お問い合わせ内容\n・アルバイト募集の場合は【お名前/ご住所/電話番号/生年月日/学年】をご記載ください\n・見積のご依頼などもお気軽にお問い合わせください"}
+        className="border border-gray-300 bg-white text-gray-900 rounded px-2 py-2 w-full text-sm"
+      />
+
+      <div className="flex items-center gap-3">
+        <button type="submit" disabled={status === "sending"} className="rounded px-3 py-2 bg-black text-white hover:bg-gray-800 text-xs">
+          {status === "sending" ? "送信中…" : "送信する"}
+        </button>
+        <span className="text-[10px] text-gray-500">採用連絡の目的のみで利用、第三者提供なし</span>
+      </div>
+
+      {status === "sent" && <p className="text-green-600 text-xs">送信が完了しました。ありがとうございます！</p>}
+      {status === "error" && <p className="text-red-500 text-xs">送信に失敗しました。時間をおいて再度お試しください。</p>}
+    </form>
+  );
+};
+
+// ---- Page ----
+export default function CorporateLandingJP() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const navItems = useMemo(() => [
+    { href: "#services", label: "サービス" },
+    { href: "#recruit", label: "アルバイト募集" },
+    { href: "#contact", label: "お問い合わせ" },
+    { href: "#company", label: "会社概要" },
+  ], []);
+
+  return (
+    <main className="min-h-screen bg-white text-gray-900">
+      <header className="sticky top-0 z-30 backdrop-blur bg-white/80 border-b border-gray-200">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="flex items-center justify-between h-20">
+            <a href="#top" className="font-bold tracking-wide text-2xl md:text-4xl text-gray-900 hover:text-indigo-500 transition">ONCREW</a>
+            <nav className="hidden md:flex items-center">
+              {navItems.map(i => <NavLink key={i.href} href={i.href}>{i.label}</NavLink>)}
+            </nav>
+            <button className="md:hidden p-2" aria-label="メニュー" onClick={() => setMenuOpen(v=>!v)}>
+              <div className="w-6 h-[2px] bg-gray-900 mb-1" />
+              <div className="w-6 h-[2px] bg-gray-900 mb-1" />
+              <div className="w-6 h-[2px] bg-gray-900" />
+            </button>
+          </div>
+          {menuOpen && (
+            <div className="md:hidden pb-2">
+              <div className="flex flex-col">
+                {navItems.map(i => (
+                  <a key={i.href} href={i.href} className="py-1 text-gray-700 hover:text-indigo-500" onClick={()=>setMenuOpen(false)}>{i.label}</a>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </header>
+
+      <section id="top" className="max-w-4xl mx-auto px-4 py-12">
+        <h1 className="text-2xl md:text-4xl font-bold leading-tight">
+        イベントの企画・制作・運営まで<br />
+        ワンストップで対応します
+        </h1>
+        <p className="text-gray-600 mt-3 text-xs md:text-sm">ONCREWはイベント企画・運営を中心に、備品の手配や申請代行までサポートします。</p>
+      </section>
+
+      <section id="services" className="max-w-4xl mx-auto px-4 py-8">
+        <SectionTitle en="Services" ja="サービス" />
+        <div className="grid md:grid-cols-3 gap-2">
+          <Card title="イベント運営" icon="🎪" accent="border-indigo-200 hover:bg-indigo-50" desc="コンサート・イベントや展示会等を設営から運営・撤去まで一貫してサポート。またディレクター・AD、ケータリングも手配可能。" />
+          <Card title="備品手配" icon="📦" accent="border-teal-200 hover:bg-teal-50" desc="イベントの備品や照明機材・音響機材など必要備品を手配。" />
+          <Card title="各種申請代行" icon="📝" accent="border-emerald-200 hover:bg-emerald-50" desc="会場申請代行や移動手配など細かい負担を軽減。" />
+        </div>
+      </section>
+
+      <section id="recruit" className="max-w-4xl mx-auto px-4 py-8">
+        <SectionTitle en="Recruit" ja="アルバイト募集" />
+        <div className="rounded-lg border border-gray-200 p-4 text-sm text-gray-700">
+          <p className="mb-2 font-medium">共に成長できる仲間を募集しています！</p>
+          <p className="mb-2">イベント・コンサート・学会の運営、コンサートの搬入出・設営・撤去、販促スタッフ、サンプリング等、いろんな仕事内容を通して、様々な経験ができます！</p>
+          <p className="mb-2">【お名前 / ご住所 / 電話番号 / 生年月日 / 学年（学生の方のみ）】を記載の上、下記のお問い合わせからご応募ください。</p>
+          <p className="text-xs text-gray-500">確認後、担当よりご連絡いたします。</p>
+        </div>
+      </section>
+
+      <section id="contact" className="max-w-4xl mx-auto px-4 py-8">
+        <SectionTitle en="Contact" ja="お問い合わせ" />
+        <div className="max-w-2xl"><ContactForm /></div>
+      </section>
+
+      <section id="company" className="max-w-4xl mx-auto px-4 py-8">
+        <SectionTitle en="Company" ja="会社概要" />
+        <div className="rounded-lg border border-gray-200 p-4 text-sm text-gray-700">
+          <dl className="grid grid-cols-3 gap-2">
+            <dd className="col-span-3 text-gray-900 font-semibold">ONCREW</dd>
+            <dt className="text-gray-500">代表</dt><dd className="col-span-2">岡村 友義</dd>
+            <dt className="text-gray-500">事業内容</dt><dd className="col-span-2">イベント企画・制作・運営、備品手配、各種申請代行</dd>
+            <dt className="text-gray-500">設立</dt><dd className="col-span-2">2015年3月</dd>
+            <dt className="text-gray-500">所在地</dt><dd className="col-span-2">岡山県岡山市北区</dd>
+          </dl>
+        </div>
+      </section>
+
+      <footer className="border-t border-gray-200 py-4 mt-4">
+        <div className="max-w-4xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-2">
+          <p className="text-[10px] md:text-xs text-gray-500">© {new Date().getFullYear()} ONCREW</p>
+          <a href="#top" className="underline text-[10px] md:text-xs text-gray-500 hover:text-indigo-500">ページ上部へ</a>
+        </div>
+      </footer>
+    </main>
+  );
+}
