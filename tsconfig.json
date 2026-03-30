@@ -13,15 +13,7 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true
-  }
-}
-  "include": [
-    "next-env.d.ts",
-    "**/*.mts",
-    "**/*.ts",
-    "**/*.tsx"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  },
+  "include": ["next-env.d.ts", "**/*.mts", "**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"]
 }
