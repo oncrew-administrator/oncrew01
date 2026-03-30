@@ -1,23 +1,19 @@
 import React, { useMemo, useState } from "react";
 
-// ---- UI Primitives ----
-type NavLinkProps = { href: string; children: React.ReactNode };
-const NavLink: React.FC<NavLinkProps> = ({ href, children }) => (
+const NavLink = ({ href, children }) => (
   <a href={href} className="px-3 py-2 text-sm md:text-base text-gray-700 hover:text-indigo-500 transition">
     {children}
   </a>
 );
 
-type SectionTitleProps = { en: string; ja: string };
-const SectionTitle: React.FC<SectionTitleProps> = ({ en, ja }) => (
+const SectionTitle = ({ en, ja }) => (
   <div className="mb-4">
     <p className="uppercase tracking-[0.4em] text-xs text-indigo-500">{en}</p>
     <h2 className="text-lg md:text-xl font-semibold mt-1 text-gray-900">{ja}</h2>
   </div>
 );
 
-type CardProps = { title: string; desc: string; icon: string; accent: string };
-const Card: React.FC<CardProps> = ({ title, desc, icon, accent }) => (
+const Card = ({ title, desc, icon, accent }) => (
   <div className={`rounded-lg border p-3 transition bg-white ${accent}`}>
     <div className="text-xl mb-1" aria-hidden>{icon}</div>
     <h3 className="font-semibold mb-1 text-sm md:text-base text-gray-900">{title}</h3>
@@ -25,12 +21,10 @@ const Card: React.FC<CardProps> = ({ title, desc, icon, accent }) => (
   </div>
 );
 
-// ---- Contact (Formspree) ----
 const FORMSPREE_ENDPOINT = "https://formspree.io/f/xnjbbbaa";
-type FormStatus = "idle" | "sending" | "sent" | "error";
 
-const ContactForm: React.FC = () => {
-  const [status, setStatus] = useState<FormStatus>("idle");
+const ContactForm = () => {
+  const [status, setStatus] = useState("idle");
 
   return (
     <form
@@ -40,9 +34,13 @@ const ContactForm: React.FC = () => {
         if (status === "sending") return;
         setStatus("sending");
         try {
-          const form = e.currentTarget as HTMLFormElement;
+          const form = e.currentTarget;
           const data = new FormData(form);
-          const res = await fetch(FORMSPREE_ENDPOINT, { method: "POST", body: data, headers: { Accept: "application/json" } });
+          const res = await fetch(FORMSPREE_ENDPOINT, {
+            method: "POST",
+            body: data,
+            headers: { Accept: "application/json" },
+          });
           if (!res.ok) throw new Error();
           form.reset();
           setStatus("sent");
@@ -76,26 +74,35 @@ const ContactForm: React.FC = () => {
   );
 };
 
-// ---- Page ----
 export default function CorporateLandingJP() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const navItems = useMemo(() => [
-    { href: "#services", label: "サービス" },
-    { href: "#recruit", label: "アルバイト募集" },
-    { href: "#contact", label: "お問い合わせ" },
-    { href: "#company", label: "会社概要" },
-  ], []);
+
+  const navItems = useMemo(
+    () => [
+      { href: "#services", label: "サービス" },
+      { href: "#recruit", label: "アルバイト募集" },
+      { href: "#contact", label: "お問い合わせ" },
+      { href: "#company", label: "会社概要" },
+    ],
+    []
+  );
 
   return (
     <main className="min-h-screen bg-white text-gray-900">
       <header className="sticky top-0 z-30 backdrop-blur bg-white/80 border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex items-center justify-between h-20">
-            <a href="#top" className="font-bold tracking-wide text-2xl md:text-4xl text-gray-900 hover:text-indigo-500 transition">ONCREW</a>
+            <a href="#top" className="font-bold tracking-wide text-2xl md:text-4xl text-gray-900 hover:text-indigo-500 transition">
+              ONCREW
+            </a>
             <nav className="hidden md:flex items-center">
-              {navItems.map(i => <NavLink key={i.href} href={i.href}>{i.label}</NavLink>)}
+              {navItems.map((i) => (
+                <NavLink key={i.href} href={i.href}>
+                  {i.label}
+                </NavLink>
+              ))}
             </nav>
-            <button className="md:hidden p-2" aria-label="メニュー" onClick={() => setMenuOpen(v=>!v)}>
+            <button className="md:hidden p-2" aria-label="メニュー" onClick={() => setMenuOpen((v) => !v)}>
               <div className="w-6 h-[2px] bg-gray-900 mb-1" />
               <div className="w-6 h-[2px] bg-gray-900 mb-1" />
               <div className="w-6 h-[2px] bg-gray-900" />
@@ -104,8 +111,10 @@ export default function CorporateLandingJP() {
           {menuOpen && (
             <div className="md:hidden pb-2">
               <div className="flex flex-col">
-                {navItems.map(i => (
-                  <a key={i.href} href={i.href} className="py-1 text-gray-700 hover:text-indigo-500" onClick={()=>setMenuOpen(false)}>{i.label}</a>
+                {navItems.map((i) => (
+                  <a key={i.href} href={i.href} className="py-1 text-gray-700 hover:text-indigo-500" onClick={() => setMenuOpen(false)}>
+                    {i.label}
+                  </a>
                 ))}
               </div>
             </div>
@@ -115,8 +124,9 @@ export default function CorporateLandingJP() {
 
       <section id="top" className="max-w-4xl mx-auto px-4 py-12">
         <h1 className="text-2xl md:text-4xl font-bold leading-tight">
-        イベントの企画・制作・運営まで<br />
-        ワンストップで対応します
+          イベントの企画・制作・運営まで
+          <br />
+          ワンストップで対応します
         </h1>
         <p className="text-gray-600 mt-3 text-xs md:text-sm">ONCREWはイベント企画・運営を中心に、備品の手配や申請代行までサポートします。</p>
       </section>
@@ -142,7 +152,9 @@ export default function CorporateLandingJP() {
 
       <section id="contact" className="max-w-4xl mx-auto px-4 py-8">
         <SectionTitle en="Contact" ja="お問い合わせ" />
-        <div className="max-w-2xl"><ContactForm /></div>
+        <div className="max-w-2xl">
+          <ContactForm />
+        </div>
       </section>
 
       <section id="company" className="max-w-4xl mx-auto px-4 py-8">
@@ -150,10 +162,14 @@ export default function CorporateLandingJP() {
         <div className="rounded-lg border border-gray-200 p-4 text-sm text-gray-700">
           <dl className="grid grid-cols-3 gap-2">
             <dd className="col-span-3 text-gray-900 font-semibold">ONCREW</dd>
-            <dt className="text-gray-500">代表</dt><dd className="col-span-2">岡村 友義</dd>
-            <dt className="text-gray-500">事業内容</dt><dd className="col-span-2">イベント企画・制作・運営、備品手配、各種申請代行</dd>
-            <dt className="text-gray-500">設立</dt><dd className="col-span-2">2015年3月</dd>
-            <dt className="text-gray-500">所在地</dt><dd className="col-span-2">岡山県岡山市北区</dd>
+            <dt className="text-gray-500">代表</dt>
+            <dd className="col-span-2">岡村 友義</dd>
+            <dt className="text-gray-500">事業内容</dt>
+            <dd className="col-span-2">イベント企画・制作・運営、備品手配、各種申請代行</dd>
+            <dt className="text-gray-500">設立</dt>
+            <dd className="col-span-2">2015年3月</dd>
+            <dt className="text-gray-500">所在地</dt>
+            <dd className="col-span-2">岡山県岡山市北区</dd>
           </dl>
         </div>
       </section>
@@ -161,7 +177,9 @@ export default function CorporateLandingJP() {
       <footer className="border-t border-gray-200 py-4 mt-4">
         <div className="max-w-4xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-2">
           <p className="text-[10px] md:text-xs text-gray-500">© {new Date().getFullYear()} ONCREW</p>
-          <a href="#top" className="underline text-[10px] md:text-xs text-gray-500 hover:text-indigo-500">ページ上部へ</a>
+          <a href="#top" className="underline text-[10px] md:text-xs text-gray-500 hover:text-indigo-500">
+            ページ上部へ
+          </a>
         </div>
       </footer>
     </main>
