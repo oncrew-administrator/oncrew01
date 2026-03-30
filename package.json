@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev"
+    "dev": "next dev",
+    "build": "next build"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.2.2",
@@ -12,11 +13,8 @@
     "react-dom": "latest"
   },
   "devDependencies": {
-    "@types/node": "25.5.0",
-    "@types/react": "19.2.14",
     "autoprefixer": "^10.4.27",
     "postcss": "^8.5.8",
-    "tailwindcss": "^4.2.2",
-    "typescript": "5.9.2"
+    "tailwindcss": "^4.2.2"
   }
 }
